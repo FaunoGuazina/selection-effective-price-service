@@ -3,14 +3,12 @@ package com.selection.effectivepriceservice.adapters.persistence.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "PRICES")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class PriceJpaEntity {
 
