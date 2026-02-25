@@ -1,5 +1,6 @@
 package com.selection.effectivepriceservice.adapters.web;
 
+import com.selection.effectivepriceservice.adapters.web.docs.PriceControllerApiDocs.GetEffectivePriceApiDoc;
 import com.selection.effectivepriceservice.adapters.web.dto.EffectivePriceResponse;
 import com.selection.effectivepriceservice.adapters.web.mapper.PriceWebMapper;
 import com.selection.effectivepriceservice.application.usecase.GetEffectivePriceUseCase;
@@ -20,6 +21,7 @@ public class PriceController {
   private final PriceWebMapper mapper;
 
   @GetMapping("/effective")
+  @GetEffectivePriceApiDoc
   public EffectivePriceResponse getEffectivePrice(
       @RequestParam @NotNull Long brandId,
       @RequestParam @NotNull Long productId,
