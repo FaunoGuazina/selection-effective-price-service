@@ -81,8 +81,8 @@ class GetEffectivePriceUseCaseTest {
   }
 
   @Test
-  @DisplayName("Should propagate repository data correctly to selector")
-  void shouldDelegateToSelector() {
+  @DisplayName("Should pass brandId and productId to repository and resolve correctly")
+  void shouldPassParametersToRepository() {
 
     var applicationDate = LocalDateTime.of(2020, 6, 14, 10, 0);
 
@@ -98,12 +98,26 @@ class GetEffectivePriceUseCaseTest {
             .currency("EUR")
             .build();
 
-    PriceRepositoryPort stubRepository = (brandId, productId) -> List.of(price);
+    class RecordingRepository implements PriceRepositoryPort {
 
-    var useCase = new GetEffectivePriceUseCase(stubRepository);
+      Long capturedBrandId;
+      Long capturedProductId;
+
+      @Override
+      public List<Price> findByBrandIdAndProductId(Long brandId, Long productId) {
+        this.capturedBrandId = brandId;
+        this.capturedProductId = productId;
+        return List.of(price);
+      }
+    }
+
+    var repository = new RecordingRepository();
+    var useCase = new GetEffectivePriceUseCase(repository);
 
     var result = useCase.execute(1L, 35455L, applicationDate);
 
-    assertThat(result.priceList()).isEqualTo(1);
+    assertThat(repository.capturedBrandId).isEqualTo(1L);
+    assertThat(repository.capturedProductId).isEqualTo(35455L);
+    assertThat(result).isEqualTo(price);
   }
 }
