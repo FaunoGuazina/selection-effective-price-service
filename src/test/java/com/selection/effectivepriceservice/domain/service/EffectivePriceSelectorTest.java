@@ -45,8 +45,7 @@ class EffectivePriceSelectorTest {
         EffectivePriceSelector.selectEffectivePrice(
             List.of(lowPriority, highPriority), applicationDate);
 
-    assertThat(result).isPresent();
-    assertThat(result.get().priceList()).isEqualTo(2);
+    assertThat(result).contains(highPriority);
   }
 
   @Test
@@ -70,5 +69,51 @@ class EffectivePriceSelectorTest {
     var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), applicationDate);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  @DisplayName("Should include price when application date equals start date")
+  void shouldIncludeWhenEqualsStartDate() {
+
+    var start = LocalDateTime.of(2020, 6, 14, 0, 0);
+
+    var price =
+        Price.builder()
+            .brandId(1L)
+            .productId(35455L)
+            .priceList(1)
+            .priority(0)
+            .startDate(start)
+            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
+            .price(BigDecimal.valueOf(35.50))
+            .currency("EUR")
+            .build();
+
+    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), start);
+
+    assertThat(result).contains(price);
+  }
+
+  @Test
+  @DisplayName("Should include price when application date equals end date")
+  void shouldIncludeWhenEqualsEndDate() {
+
+    var end = LocalDateTime.of(2020, 12, 31, 23, 59);
+
+    var price =
+        Price.builder()
+            .brandId(1L)
+            .productId(35455L)
+            .priceList(1)
+            .priority(0)
+            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
+            .endDate(end)
+            .price(BigDecimal.valueOf(35.50))
+            .currency("EUR")
+            .build();
+
+    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), end);
+
+    assertThat(result).contains(price);
   }
 }
