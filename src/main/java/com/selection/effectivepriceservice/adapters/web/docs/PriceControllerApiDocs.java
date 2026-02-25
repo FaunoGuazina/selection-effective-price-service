@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,6 +18,15 @@ import org.springframework.http.ProblemDetail;
 
 @UtilityClass
 public final class PriceControllerApiDocs {
+
+  /** Controller-level OpenAPI documentation for PriceController. */
+  @Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @Tag(
+      name = "Prices",
+      description =
+          "Operations related to price retrieval and effective price calculation based on date ranges and priority rules.")
+  public @interface PriceControllerApiDoc {}
 
   /**
    * GET /api/prices/effective

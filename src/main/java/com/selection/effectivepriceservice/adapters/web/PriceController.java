@@ -1,6 +1,7 @@
 package com.selection.effectivepriceservice.adapters.web;
 
 import com.selection.effectivepriceservice.adapters.web.docs.PriceControllerApiDocs.GetEffectivePriceApiDoc;
+import com.selection.effectivepriceservice.adapters.web.docs.PriceControllerApiDocs.PriceControllerApiDoc;
 import com.selection.effectivepriceservice.adapters.web.dto.EffectivePriceResponse;
 import com.selection.effectivepriceservice.adapters.web.mapper.PriceWebMapper;
 import com.selection.effectivepriceservice.application.usecase.GetEffectivePriceUseCase;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @RequestMapping("/api/prices")
+@PriceControllerApiDoc
 @RequiredArgsConstructor
 public class PriceController {
 
