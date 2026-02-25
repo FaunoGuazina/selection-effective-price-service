@@ -9,15 +9,18 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public final class EffectivePriceSelector {
+public class EffectivePriceSelector {
 
-  private static final Comparator<Price> BY_PRIORITY = Comparator.comparing(Price::priority);
+  private static final Comparator<Price> BY_PRIORITY_THEN_PRICE_LIST =
+      Comparator.comparing(Price::priority).thenComparing(Price::priceList);
 
   Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
 
     Objects.requireNonNull(prices);
     Objects.requireNonNull(applicationDate);
 
-    return prices.stream().filter(price -> price.isEffectiveAt(applicationDate)).max(BY_PRIORITY);
+    return prices.stream()
+        .filter(price -> price.isEffectiveAt(applicationDate))
+        .max(BY_PRIORITY_THEN_PRICE_LIST);
   }
 }
