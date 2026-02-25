@@ -2,6 +2,8 @@ package com.selection.effectivepriceservice.adapters.web.docs;
 
 import com.selection.effectivepriceservice.adapters.web.dto.EffectivePriceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +29,26 @@ public final class PriceControllerApiDocs {
       summary = "Get effective price",
       description =
           "Returns the effective price for a given brandId, productId and applicationDateTime. "
+              + "The applicationDateTime must follow ISO-8601 format (yyyy-MM-dd'T'HH:mm:ss). "
               + "If multiple prices match the date range, the one with the highest priority is selected.")
+  @Parameter(
+      name = "brandId",
+      description = "Identifier of the brand",
+      required = true,
+      in = ParameterIn.QUERY,
+      example = "1")
+  @Parameter(
+      name = "productId",
+      description = "Identifier of the product",
+      required = true,
+      in = ParameterIn.QUERY,
+      example = "35455")
+  @Parameter(
+      name = "applicationDateTime",
+      description = "Application date-time in ISO-8601 format (yyyy-MM-dd'T'HH:mm:ss)",
+      required = true,
+      in = ParameterIn.QUERY,
+      example = "2020-06-14T10:00:00")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -36,7 +57,21 @@ public final class PriceControllerApiDocs {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = EffectivePriceResponse.class))),
+                    schema =
+                        @Schema(
+                            implementation = EffectivePriceResponse.class,
+                            example =
+                                """
+              {
+                "brandId": 1,
+                "productId": 35455,
+                "priceList": 1,
+                "startDate": "2020-06-14T00:00:00",
+                "endDate": "2020-12-31T23:59:59",
+                "price": 35.50,
+                "currency": "EUR"
+              }
+              """))),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request parameters",
