@@ -17,14 +17,19 @@ public record Price(
     String currency) {
 
   public Price {
-    Objects.requireNonNull(brandId);
-    Objects.requireNonNull(productId);
-    Objects.requireNonNull(priceList);
-    Objects.requireNonNull(priority);
-    Objects.requireNonNull(startDate);
-    Objects.requireNonNull(endDate);
-    Objects.requireNonNull(price);
-    Objects.requireNonNull(currency);
+    final var errMsg = " must not be null";
+    Objects.requireNonNull(brandId, "brandId" + errMsg);
+    Objects.requireNonNull(productId, "productId" + errMsg);
+    Objects.requireNonNull(priceList, "priceList" + errMsg);
+    Objects.requireNonNull(priority, "priority" + errMsg);
+    Objects.requireNonNull(startDate, "startDate" + errMsg);
+    Objects.requireNonNull(endDate, "endDate" + errMsg);
+    Objects.requireNonNull(price, "price" + errMsg);
+    Objects.requireNonNull(currency, "currency" + errMsg);
+
+    if (startDate.isAfter(endDate)) {
+      throw new IllegalArgumentException("startDate must be before or equal to endDate");
+    }
   }
 
   public boolean isEffectiveAt(LocalDateTime applicationDate) {
