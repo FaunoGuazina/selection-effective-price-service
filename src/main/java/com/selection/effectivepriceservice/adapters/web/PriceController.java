@@ -27,7 +27,7 @@ public class PriceController {
   public EffectivePriceResponse getEffectivePrice(
       @RequestParam @NotNull Long brandId,
       @RequestParam @NotNull Long productId,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+      @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime applicationDateTime) {
 
     var price = useCase.execute(brandId, productId, applicationDateTime);
