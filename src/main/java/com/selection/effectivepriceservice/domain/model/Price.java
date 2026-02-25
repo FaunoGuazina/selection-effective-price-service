@@ -11,4 +11,9 @@ public record Price(
     LocalDateTime startDate,
     LocalDateTime endDate,
     BigDecimal price,
-    String currency) {}
+    String currency) {
+
+  public boolean isEffectiveAt(LocalDateTime applicationDate) {
+    return !applicationDate.isBefore(startDate) && !applicationDate.isAfter(endDate);
+  }
+}

@@ -10,10 +10,7 @@ public class EffectivePriceSelector {
 
   public Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
     return prices.stream()
-        .filter(
-            price ->
-                !applicationDate.isBefore(price.startDate())
-                    && !applicationDate.isAfter(price.endDate()))
+        .filter(price -> price.isEffectiveAt(applicationDate))
         .max(Comparator.comparing(Price::priority));
   }
 }
