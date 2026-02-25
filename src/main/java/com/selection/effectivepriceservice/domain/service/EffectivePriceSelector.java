@@ -14,7 +14,7 @@ public class EffectivePriceSelector {
   private static final Comparator<Price> BY_PRIORITY_THEN_PRICE_LIST =
       Comparator.comparing(Price::priority).thenComparing(Price::priceList);
 
-  Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
+  public Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
 
     Objects.requireNonNull(prices);
     Objects.requireNonNull(applicationDate);
