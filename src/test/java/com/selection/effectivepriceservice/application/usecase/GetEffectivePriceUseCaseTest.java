@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.selection.effectivepriceservice.application.port.PriceRepositoryPort;
+import com.selection.effectivepriceservice.domain.exception.EffectivePriceNotFoundException;
 import com.selection.effectivepriceservice.domain.model.Price;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -75,7 +76,7 @@ class GetEffectivePriceUseCaseTest {
     var useCase = new GetEffectivePriceUseCase(stubRepository);
 
     assertThatThrownBy(() -> useCase.execute(1L, 35455L, applicationDate))
-        .isInstanceOf(IllegalStateException.class)
+        .isInstanceOf(EffectivePriceNotFoundException.class)
         .hasMessageContaining("No effective price found");
   }
 
