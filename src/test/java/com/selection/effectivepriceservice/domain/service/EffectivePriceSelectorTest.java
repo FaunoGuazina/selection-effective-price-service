@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Test;
 
 class EffectivePriceSelectorTest {
 
-  private final EffectivePriceSelector selector = new EffectivePriceSelector();
-
   @Test
   @DisplayName("Should return highest priority price when multiple prices overlap")
   void shouldReturnHighestPriorityWhenMultipleMatch() {
@@ -41,7 +39,9 @@ class EffectivePriceSelectorTest {
             BigDecimal.valueOf(25.45),
             "EUR");
 
-    var result = selector.selectEffectivePrice(List.of(lowPriority, highPriority), applicationDate);
+    var result =
+        EffectivePriceSelector.selectEffectivePrice(
+            List.of(lowPriority, highPriority), applicationDate);
 
     assertThat(result).isPresent();
     assertThat(result.get().priceList()).isEqualTo(2);
@@ -64,7 +64,7 @@ class EffectivePriceSelectorTest {
             BigDecimal.valueOf(35.50),
             "EUR");
 
-    var result = selector.selectEffectivePrice(List.of(price), applicationDate);
+    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), applicationDate);
 
     assertThat(result).isEmpty();
   }
