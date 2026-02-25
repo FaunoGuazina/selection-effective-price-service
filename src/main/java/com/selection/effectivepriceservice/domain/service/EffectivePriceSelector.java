@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public class EffectivePriceSelector {
 
+  private static final Comparator<Price> BY_PRIORITY = Comparator.comparing(Price::priority);
+
   public Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
-    return prices.stream()
-        .filter(price -> price.isEffectiveAt(applicationDate))
-        .max(Comparator.comparing(Price::priority));
+    return prices.stream().filter(price -> price.isEffectiveAt(applicationDate)).max(BY_PRIORITY);
   }
 }
