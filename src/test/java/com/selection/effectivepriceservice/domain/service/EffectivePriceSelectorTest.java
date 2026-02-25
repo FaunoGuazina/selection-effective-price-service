@@ -18,26 +18,28 @@ class EffectivePriceSelectorTest {
     var applicationDate = LocalDateTime.of(2020, 6, 14, 16, 0);
 
     var lowPriority =
-        new Price(
-            1L,
-            35455L,
-            1,
-            0,
-            LocalDateTime.of(2020, 6, 14, 0, 0),
-            LocalDateTime.of(2020, 12, 31, 23, 59),
-            BigDecimal.valueOf(35.50),
-            "EUR");
+        Price.builder()
+            .brandId(1L)
+            .productId(35455L)
+            .priceList(1)
+            .priority(0)
+            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
+            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
+            .price(BigDecimal.valueOf(35.50))
+            .currency("EUR")
+            .build();
 
     var highPriority =
-        new Price(
-            1L,
-            35455L,
-            2,
-            1,
-            LocalDateTime.of(2020, 6, 14, 15, 0),
-            LocalDateTime.of(2020, 6, 14, 18, 30),
-            BigDecimal.valueOf(25.45),
-            "EUR");
+        Price.builder()
+            .brandId(1L)
+            .productId(35455L)
+            .priceList(2)
+            .priority(1)
+            .startDate(LocalDateTime.of(2020, 6, 14, 15, 0))
+            .endDate(LocalDateTime.of(2020, 6, 14, 18, 30))
+            .price(BigDecimal.valueOf(25.45))
+            .currency("EUR")
+            .build();
 
     var result =
         EffectivePriceSelector.selectEffectivePrice(
@@ -54,15 +56,16 @@ class EffectivePriceSelectorTest {
     var applicationDate = LocalDateTime.of(2019, 1, 1, 10, 0);
 
     var price =
-        new Price(
-            1L,
-            35455L,
-            1,
-            0,
-            LocalDateTime.of(2020, 6, 14, 0, 0),
-            LocalDateTime.of(2020, 12, 31, 23, 59),
-            BigDecimal.valueOf(35.50),
-            "EUR");
+        Price.builder()
+            .brandId(1L)
+            .productId(35455L)
+            .priceList(1)
+            .priority(0)
+            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
+            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
+            .price(BigDecimal.valueOf(35.50))
+            .currency("EUR")
+            .build();
 
     var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), applicationDate);
 

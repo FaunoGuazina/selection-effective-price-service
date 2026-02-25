@@ -2,7 +2,9 @@ package com.selection.effectivepriceservice.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Builder;
 
+@Builder
 public record Price(
     Long brandId,
     Long productId,

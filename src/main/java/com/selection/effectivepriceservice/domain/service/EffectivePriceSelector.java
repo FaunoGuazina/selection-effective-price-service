@@ -6,15 +6,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public final class EffectivePriceSelector {
 
   private static final Comparator<Price> BY_PRIORITY = Comparator.comparing(Price::priority);
 
-  private EffectivePriceSelector() {}
-
-  public static Optional<Price> selectEffectivePrice(
-      List<Price> prices, LocalDateTime applicationDate) {
+  Optional<Price> selectEffectivePrice(List<Price> prices, LocalDateTime applicationDate) {
 
     Objects.requireNonNull(prices);
     Objects.requireNonNull(applicationDate);
