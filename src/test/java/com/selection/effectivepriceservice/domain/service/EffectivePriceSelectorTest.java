@@ -20,29 +20,8 @@ class EffectivePriceSelectorTest {
 
     var applicationDate = LocalDateTime.of(2020, 6, 14, 16, 0);
 
-    var lowPriority =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
-    var highPriority =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(2)
-            .priority(1)
-            .startDate(LocalDateTime.of(2020, 6, 14, 15, 0))
-            .endDate(LocalDateTime.of(2020, 6, 14, 18, 30))
-            .price(BigDecimal.valueOf(25.45))
-            .currency("EUR")
-            .build();
+    var lowPriority = price(1, 0, 0, 1, 23, 59, 35.50);
+    var highPriority = price(2, 1, 15, 0, 18, 30, 25.45);
 
     var result =
         EffectivePriceSelector.selectEffectivePrice(
@@ -51,93 +30,35 @@ class EffectivePriceSelectorTest {
     assertThat(result).contains(highPriority);
   }
 
-  @Test
-  @DisplayName("Should return empty when no price matches date")
-  void shouldReturnEmptyWhenNoMatch() {
-
-    var applicationDate = LocalDateTime.of(2019, 1, 1, 10, 0);
-
-    var price =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
-    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), applicationDate);
-
-    assertThat(result).isEmpty();
-  }
-
   @ParameterizedTest
   @MethodSource("boundaryDates")
   @DisplayName("Should include price when application date equals boundary")
   void shouldIncludeWhenEqualsBoundary(LocalDateTime boundary) {
 
-    var price =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
+    var price = price(1, 0, 0, 0, 23, 59, 35.50);
 
-    var result =
-        EffectivePriceSelector.selectEffectivePrice(List.of(price), boundary);
+    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), boundary);
 
     assertThat(result).contains(price);
   }
 
   static Stream<LocalDateTime> boundaryDates() {
-    return Stream.of(
-        LocalDateTime.of(2020, 6, 14, 0, 0),
-        LocalDateTime.of(2020, 12, 31, 23, 59));
+    return Stream.of(LocalDateTime.of(2020, 6, 14, 0, 0), LocalDateTime.of(2020, 6, 14, 23, 59));
   }
 
   @Test
-  @DisplayName("Should return any matching price when priorities are equal")
-  void shouldReturnAnyWhenPriorityTie() {
+  @DisplayName("Should return priceList wins with highest priceList when priorities are equal")
+  void shouldResolveDeterministicallyWhenPriorityTie() {
 
     var applicationDate = LocalDateTime.of(2020, 6, 14, 10, 0);
 
-    var first =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(1)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
-    var second =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(2)
-            .priority(1)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(30.00))
-            .currency("EUR")
-            .build();
+    var first = price(1, 1, 0, 0, 23, 59, 35.50);
+    var second = price(2, 1, 0, 0, 23, 59, 30.00);
 
     var result =
         EffectivePriceSelector.selectEffectivePrice(List.of(first, second), applicationDate);
 
-    assertThat(result).isPresent();
-    assertThat(result.get().priority()).isEqualTo(1);
+    assertThat(result).contains(second);
   }
 
   @Test
@@ -146,18 +67,7 @@ class EffectivePriceSelectorTest {
 
     var applicationDate = LocalDateTime.of(2019, 1, 1, 10, 0);
 
-    var first =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
+    var first = price(1, 0, 0, 0, 23, 59, 35.50);
     var second =
         Price.builder()
             .brandId(1L)
@@ -173,6 +83,41 @@ class EffectivePriceSelectorTest {
     var result =
         EffectivePriceSelector.selectEffectivePrice(List.of(first, second), applicationDate);
 
-    assertThat(result).isEmpty();
+    assertThat(result).isNotPresent();
+  }
+
+  @Test
+  @DisplayName("Should return empty when no price matches date")
+  void shouldReturnEmptyWhenNoMatch() {
+
+    var applicationDate = LocalDateTime.of(2019, 1, 1, 10, 0);
+    var price = price(1, 0, 0, 0, 23, 59, 35.50);
+
+    var result = EffectivePriceSelector.selectEffectivePrice(List.of(price), applicationDate);
+
+    assertThat(result).isNotPresent();
+  }
+
+  // ---------- Test factory ----------
+
+  private Price price(
+      int priceList,
+      int priority,
+      int startHour,
+      int startMinute,
+      int endHour,
+      int endMinute,
+      double amount) {
+
+    return Price.builder()
+        .brandId(1L)
+        .productId(35455L)
+        .priceList(priceList)
+        .priority(priority)
+        .startDate(LocalDateTime.of(2020, 6, 14, startHour, startMinute))
+        .endDate(LocalDateTime.of(2020, 6, 14, endHour, endMinute))
+        .price(BigDecimal.valueOf(amount))
+        .currency("EUR")
+        .build();
   }
 }
