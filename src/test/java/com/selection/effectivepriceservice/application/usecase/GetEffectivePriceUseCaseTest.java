@@ -8,31 +8,19 @@ import com.selection.effectivepriceservice.domain.exception.EffectivePriceNotFou
 import com.selection.effectivepriceservice.domain.model.Price;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class GetEffectivePriceUseCaseTest {
 
   @Test
-  @DisplayName("Should return effective price when repository returns matching prices")
+  @DisplayName("Should return effective price when repository returns a matching price")
   void shouldReturnEffectivePrice() {
 
     var applicationDate = LocalDateTime.of(2020, 6, 14, 16, 0);
 
-    var lowPriority =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
-    var highPriority =
+    var price =
         Price.builder()
             .brandId(1L)
             .productId(35455L)
@@ -44,34 +32,24 @@ class GetEffectivePriceUseCaseTest {
             .currency("EUR")
             .build();
 
-    PriceRepositoryPort stubRepository = (brandId, productId) -> List.of(lowPriority, highPriority);
+    PriceRepositoryPort stubRepository =
+        (brandId, productId, applicationDateTime) -> Optional.of(price);
 
     var useCase = new GetEffectivePriceUseCase(stubRepository);
 
     var result = useCase.execute(1L, 35455L, applicationDate);
 
-    assertThat(result).isEqualTo(highPriority);
+    assertThat(result).isEqualTo(price);
   }
 
   @Test
-  @DisplayName("Should throw exception when no effective price is found")
+  @DisplayName("Should throw exception when repository returns empty")
   void shouldThrowWhenNoPriceFound() {
 
     var applicationDate = LocalDateTime.of(2019, 1, 1, 10, 0);
 
-    var price =
-        Price.builder()
-            .brandId(1L)
-            .productId(35455L)
-            .priceList(1)
-            .priority(0)
-            .startDate(LocalDateTime.of(2020, 6, 14, 0, 0))
-            .endDate(LocalDateTime.of(2020, 12, 31, 23, 59))
-            .price(BigDecimal.valueOf(35.50))
-            .currency("EUR")
-            .build();
-
-    PriceRepositoryPort stubRepository = (brandId, productId) -> List.of(price);
+    PriceRepositoryPort stubRepository =
+        (brandId, productId, applicationDateTime) -> Optional.empty();
 
     var useCase = new GetEffectivePriceUseCase(stubRepository);
 
@@ -81,7 +59,7 @@ class GetEffectivePriceUseCaseTest {
   }
 
   @Test
-  @DisplayName("Should pass brandId and productId to repository and resolve correctly")
+  @DisplayName("Should pass brandId, productId and applicationDate to repository")
   void shouldPassParametersToRepository() {
 
     var applicationDate = LocalDateTime.of(2020, 6, 14, 10, 0);
@@ -102,12 +80,17 @@ class GetEffectivePriceUseCaseTest {
 
       Long capturedBrandId;
       Long capturedProductId;
+      LocalDateTime capturedApplicationDate;
 
       @Override
-      public List<Price> findByBrandIdAndProductId(Long brandId, Long productId) {
+      public Optional<Price> findEffectivePrice(
+          Long brandId, Long productId, LocalDateTime applicationDateTime) {
+
         this.capturedBrandId = brandId;
         this.capturedProductId = productId;
-        return List.of(price);
+        this.capturedApplicationDate = applicationDateTime;
+
+        return Optional.of(price);
       }
     }
 
@@ -118,6 +101,7 @@ class GetEffectivePriceUseCaseTest {
 
     assertThat(repository.capturedBrandId).isEqualTo(1L);
     assertThat(repository.capturedProductId).isEqualTo(35455L);
+    assertThat(repository.capturedApplicationDate).isEqualTo(applicationDate);
     assertThat(result).isEqualTo(price);
   }
 }
