@@ -1,10 +1,11 @@
 package com.selection.effectivepriceservice.adapters.persistence;
 
 import com.selection.effectivepriceservice.adapters.persistence.mapper.PricePersistenceMapper;
-import com.selection.effectivepriceservice.adapters.persistence.repository.SpringDataPriceRepository;
+import com.selection.effectivepriceservice.adapters.persistence.repository.PriceRepository;
 import com.selection.effectivepriceservice.application.port.PriceRepositoryPort;
 import com.selection.effectivepriceservice.domain.model.Price;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -12,14 +13,12 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class PriceRepositoryAdapter implements PriceRepositoryPort {
 
-  private final SpringDataPriceRepository repository;
+  private final PriceRepository repository;
   private final PricePersistenceMapper mapper;
 
   @Override
-  public List<Price> findByBrandIdAndProductId(Long brandId, Long productId) {
-
-    return repository.findByBrandIdAndProductId(brandId, productId).stream()
-        .map(mapper::toDomain)
-        .toList();
+  public Optional<Price> findEffectivePrice(
+      Long brandId, Long productId, LocalDateTime applicationDate) {
+    return repository.findEffectivePrice(brandId, productId, applicationDate).map(mapper::toDomain);
   }
 }
