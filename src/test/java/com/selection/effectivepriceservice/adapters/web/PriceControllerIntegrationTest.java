@@ -76,4 +76,37 @@ class PriceControllerIntegrationTest {
                 .param("applicationDateTime", "invalid-date"))
         .andExpect(status().isBadRequest());
   }
+
+  @Test
+  @DisplayName("Should return 400 when brandId is missing")
+  void shouldReturnBadRequestWhenBrandIdMissing() throws Exception {
+
+    mockMvc
+        .perform(
+            get("/api/prices/effective")
+                .param("productId", "35455")
+                .param("applicationDateTime", "2020-06-14T10:00:00"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return 400 when productId is missing")
+  void shouldReturnBadRequestWhenProductIdMissing() throws Exception {
+
+    mockMvc
+        .perform(
+            get("/api/prices/effective")
+                .param("brandId", "1")
+                .param("applicationDateTime", "2020-06-14T10:00:00"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Should return 400 when applicationDateTime is missing")
+  void shouldReturnBadRequestWhenApplicationDateTimeMissing() throws Exception {
+
+    mockMvc
+        .perform(get("/api/prices/effective").param("brandId", "1").param("productId", "35455"))
+        .andExpect(status().isBadRequest());
+  }
 }

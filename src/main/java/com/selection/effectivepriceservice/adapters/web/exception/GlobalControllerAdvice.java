@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -99,6 +100,20 @@ public class GlobalControllerAdvice {
             .toList());
 
     problem.setProperty(ERROR_CODE_PROPERTY, "BODY_VALIDATION_ERROR");
+
+    return problem;
+  }
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ProblemDetail handleMissingParameter(
+      MissingServletRequestParameterException ex, HttpServletRequest request) {
+
+    var problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+    problem.setTitle("Missing required parameter");
+    problem.setDetail("Parameter '%s' is required".formatted(ex.getParameterName()));
+    problem.setType(URI.create("https://api.yourdomain.com/errors/missing-parameter"));
+    problem.setInstance(URI.create(request.getRequestURI()));
+    problem.setProperty(ERROR_CODE_PROPERTY, "MISSING_PARAMETER");
 
     return problem;
   }
