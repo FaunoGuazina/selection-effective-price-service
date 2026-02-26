@@ -129,11 +129,14 @@ If multiple prices match:
 1. Highest `priority` wins
 2. If equal, highest `priceList` is selected (deterministic tie-breaker)
 
-The algorithm is implemented as a pure domain function:
+The effective price selection is delegated to the persistence layer using a deterministic database
+query:
 
-EffectivePriceSelector.selectEffectivePrice(...)
+- startDate <= applicationDateTime <= endDate (inclusive)
+- ORDER BY priority DESC, priceList DESC
+- LIMIT 1
 
-No framework dependencies.
+This approach ensures scalability and avoids loading the full price history into memory.
 
 ---
 
@@ -149,7 +152,6 @@ config/
 ## Domain
 
 - `Price` (immutable record + invariants)
-- `EffectivePriceSelector` (pure selection algorithm)
 - Domain exception
 
 No Spring dependencies.
@@ -188,10 +190,8 @@ Never the opposite.
 
 ### Domain
 
-- Selection correctness
-- Boundary inclusivity
-- Deterministic tie resolution
-- No match scenarios
+- Domain invariants validation (non-null fields, date consistency)
+- Constructor-level validation (startDate <= endDate)
 
 ### Application
 
@@ -253,9 +253,9 @@ The controller is fully documented using OpenAPI annotations and provides:
 # 🔍 Design Decisions
 
 - Hexagonal architecture to isolate domain logic
-- Pure selection algorithm (no side effects)
+- Deterministic database-driven selection (priority DESC, priceList DESC)
+- Delegation of filtering and ordering to the database for scalability
 - Immutable domain model
-- Deterministic comparator for reproducibility
 - MapStruct for explicit mapping
 - ProblemDetail for standardized error responses
 - Conventional Commits per incremental story step
