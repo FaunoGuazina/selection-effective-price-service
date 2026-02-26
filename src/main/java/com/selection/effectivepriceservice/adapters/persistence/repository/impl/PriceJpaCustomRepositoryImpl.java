@@ -21,13 +21,14 @@ public class PriceJpaCustomRepositoryImpl implements PriceJpaCustomRepository {
     var query =
         entityManager.createQuery(
             """
-            SELECT p
-            FROM PriceJpaEntity p
-            WHERE p.brandId = :brandId
-              AND p.productId = :productId
-              AND :applicationDate BETWEEN p.startDate AND p.endDate
-            ORDER BY p.priority DESC, p.priceList DESC
-        """,
+                    SELECT p
+                    FROM PriceJpaEntity p
+                    WHERE p.brandId = :brandId
+                      AND p.productId = :productId
+                      AND p.startDate <= :applicationDate
+                          AND p.endDate >= :applicationDate
+                    ORDER BY p.priority DESC, p.priceList DESC
+                """,
             PriceJpaEntity.class);
 
     query.setParameter("brandId", brandId);
