@@ -312,7 +312,19 @@ The domain was completed and fully tested before introducing infrastructure.
 - Add Makefile
 - Improve configuration clarity
 
-Each commit reflects a clear architectural step and respects Conventional Commits.
+## 7. Scalability Refinement
+
+- Identified that resolving the effective price in memory required loading the full price history
+  for a product and brand.
+- Refactored the selection logic to delegate filtering and ordering to the database layer.
+- Replaced in-memory resolution with a deterministic JPQL query using explicit temporal bounds.
+- Introduced a composite index aligned with equality filters, temporal range conditions and ordering
+  pattern.
+- Ensured deterministic ordering (`priority DESC`, `priceList DESC`) combined with `LIMIT 1` for
+  efficient execution.
+
+This refinement improves scalability, avoids unnecessary memory consumption and aligns the
+implementation with production-grade data access patterns.
 
 ---
 
