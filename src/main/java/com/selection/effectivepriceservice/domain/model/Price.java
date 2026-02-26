@@ -31,4 +31,9 @@ public record Price(
       throw new IllegalArgumentException("startDate must be before or equal to endDate");
     }
   }
+
+  public boolean isEffectiveAt(LocalDateTime applicationDate) {
+    Objects.requireNonNull(applicationDate);
+    return !applicationDate.isBefore(startDate) && !applicationDate.isAfter(endDate);
+  }
 }
