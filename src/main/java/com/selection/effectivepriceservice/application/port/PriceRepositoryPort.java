@@ -2,9 +2,10 @@ package com.selection.effectivepriceservice.application.port;
 
 import com.selection.effectivepriceservice.domain.model.Price;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 public interface PriceRepositoryPort {
 
-  Optional<Price> findEffectivePrice(Long brandId, Long productId, LocalDateTime applicationDate);
+  List<Price> findPricesByBrandProductAndDate(
+      Long brandId, Long productId, LocalDateTime applicationDate);
 }
