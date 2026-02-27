@@ -129,14 +129,15 @@ If multiple prices match:
 1. Highest `priority` wins
 2. If equal, highest `priceList` is selected (deterministic tie-breaker)
 
-The effective price selection is delegated to the persistence layer using a deterministic database
-query:
+The persistence layer filters prices by brand, product, and temporal range:
 
 - startDate <= applicationDateTime <= endDate (inclusive)
-- ORDER BY priority DESC, priceList DESC
-- LIMIT 1
 
-This approach ensures scalability and avoids loading the full price history into memory.
+The business selection rule (highest priority, deterministic tie-breaker by priceList)
+is executed in the domain layer through `EffectivePriceSelector`.
+
+This preserves business logic independence from infrastructure and ensures
+that selection criteria remain part of the domain model.
 
 ---
 
@@ -253,8 +254,8 @@ The controller is fully documented using OpenAPI annotations and provides:
 # 🔍 Design Decisions
 
 - Hexagonal architecture to isolate domain logic
-- Deterministic database-driven selection (priority DESC, priceList DESC)
-- Delegation of filtering and ordering to the database for scalability
+- Domain-driven selection of effective price
+- Persistence layer restricted to data retrieval and filtering
 - Immutable domain model
 - MapStruct for explicit mapping
 - ProblemDetail for standardized error responses
@@ -312,19 +313,21 @@ The domain was completed and fully tested before introducing infrastructure.
 - Add Makefile
 - Improve configuration clarity
 
-## 7. Scalability Refinement
+## 7. Architectural Refinement
 
-- Identified that resolving the effective price in memory required loading the full price history
-  for a product and brand.
-- Refactored the selection logic to delegate filtering and ordering to the database layer.
-- Replaced in-memory resolution with a deterministic JPQL query using explicit temporal bounds.
-- Introduced a composite index aligned with equality filters, temporal range conditions and ordering
-  pattern.
-- Ensured deterministic ordering (`priority DESC`, `priceList DESC`) combined with `LIMIT 1` for
-  efficient execution.
+- Identified that delegating the effective price selection entirely to the database mixed
+  infrastructure concerns with business rules.
+- Re-evaluated the approach to ensure strict separation of responsibilities in accordance
+  with hexagonal architecture principles.
+- Limited the persistence layer to filtering by brand, product, and temporal range.
+- Restored the effective price selection rule (highest priority, deterministic tie-breaker by
+  priceList)
+  to the domain layer via `EffectivePriceSelector`.
+- Preserved deterministic ordering at the database level for stable result sets, without
+  embedding business decision logic in infrastructure.
 
-This refinement improves scalability, avoids unnecessary memory consumption and aligns the
-implementation with production-grade data access patterns.
+This refinement reinforces domain purity, keeps business rules independent of persistence
+mechanisms, and maintains scalability while respecting architectural boundaries.
 
 ---
 
